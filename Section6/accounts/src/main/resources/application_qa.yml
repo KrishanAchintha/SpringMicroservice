@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: "qa"
+
+build:
+  version: "2.0"
+
+accounts:
+  message: "Updated message from accounts service"
+  contactDetails:
+    name: "Jane Smith-QA"
+    email: "janesmith@example.com"
+  onCallSupport:
+      - (800) 987-6543
+      - (800) 654-3210

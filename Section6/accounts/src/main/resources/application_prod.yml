@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+
+build:
+    version: "1.0"
+
+accounts:
+    message: "Hello from accounts service"
+    contactDetails:
+        name: "John Doe-Production"
+        email: "testemail@gmail.com"
+    onCallSupport:
+        - (800) 123-4567
+        - (800) 765-4321
