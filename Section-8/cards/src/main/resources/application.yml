@@ -2,11 +2,11 @@ server:
   port: 9000
 spring:
   profiles:
-      active: "qa"
+      active: "default"
   application:
       name: cards
   datasource:
-    url: jdbc:mysql://localhost:3308/cardsdb
+    url: jdbc:mysql://localhost:3303/cardsdb
     username: root
     password: root
   jpa:

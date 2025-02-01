@@ -4,9 +4,9 @@ spring:
   application:
     name: accounts
   profiles:
-    active: "prod"
+    active: "default"
   datasource:
-    url: jdbc:mysql://localhost:3305/accountsdb
+    url: jdbc:mysql://localhost:3301/accountsdb
     username: root
     password: root
   jpa:
