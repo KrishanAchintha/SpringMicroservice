@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class CardController {
 
+    private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CardController.class);
 
     private ICardsService  cardsService;
 
@@ -89,9 +90,11 @@ public class CardController {
             )
     })
     @GetMapping("/fetch")
-    public ResponseEntity<CardsDto> fetchCardDetails(@RequestParam
+    public ResponseEntity<CardsDto> fetchCardDetails(  @RequestHeader("tmx-correlation-id") String correlationId,
+                                                        @RequestParam
                                                      @Pattern(regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
                                                      String mobileNumber) {
+        LOGGER.debug("Correlation ID: {}", correlationId);
         CardsDto cardsDto = cardsService.fetchCard(mobileNumber);
         return ResponseEntity.status(HttpStatus.OK).body(cardsDto);
     }
