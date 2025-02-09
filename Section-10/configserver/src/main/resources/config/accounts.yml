@@ -1,0 +1,12 @@
+build:
+  version: "3.0"
+
+accounts:
+  message: "Hello from accounts service"
+  contactDetails:
+    name: "John Doe"
+    email: "johndoe@gmail.com"
+  onCallSupport:
+    - (800) 123-4567
+    - (800) 765-4321
+
