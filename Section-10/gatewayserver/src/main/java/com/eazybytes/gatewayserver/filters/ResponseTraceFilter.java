@@ -24,8 +24,10 @@ public class ResponseTraceFilter {
         return (exchange, chain) -> chain.filter(exchange).then(Mono.fromRunnable(() -> {
             HttpHeaders requestHeaders = exchange.getRequest().getHeaders();
             String correlationID = filterUtility.getCorrelationId(requestHeaders);
-            logger.debug("tmx-correlation-id found in incoming request: {}. ", correlationID);
-            exchange.getResponse().getHeaders().add(FilterUtility.CORRELATION_ID, correlationID);
+            if(exchange.getResponse().getHeaders().containsKey(FilterUtility.CORRELATION_ID)) {
+                logger.debug("tmx-correlation-id found in incoming request: {}. ", correlationID);
+                exchange.getResponse().getHeaders().add(FilterUtility.CORRELATION_ID, correlationID);
+            }
         }));
     }
 }

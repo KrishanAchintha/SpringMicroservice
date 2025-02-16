@@ -5,6 +5,7 @@
       <option name="customHeaders">
         <set>
           <option value="tmx-correlation-id" />
+          <option value="user" />
         </set>
       </option>
     </inspection_tool>
