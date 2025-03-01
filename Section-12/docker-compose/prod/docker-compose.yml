@@ -1,4 +1,18 @@
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    container_name: keycloak
+    ports:
+      - "7080:8080"
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+    command: "start-dev"
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
+
   read:
     image: grafana/loki:3.1.2
     command: "-config.file=/etc/loki/config.yaml -target=read"
@@ -80,6 +94,30 @@ services:
       file: common-config.yml
       service: network-deploy-service
 
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: tempo
+    command: -config.file /etc/tempo-config.yml
+    ports:
+      - "3110:3100"
+      - "4318:4318"
+    volumes:
+      - ../observability/tempo/tempo.yml:/etc/tempo-config.yml
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
   grafana:
     image: grafana/grafana:11.4.0
     environment:
@@ -102,6 +140,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
+  backend:
+    image: grafana/loki:3.1.2
+    volumes:
+      - ../observability/loki/loki-config.yaml:/etc/loki/config.yaml
+    ports:
+      - "3100"
+      - "7946"
+    command: "-config.file=/etc/loki/config.yaml -target=backend -legacy-read-mode=false"
+    depends_on:
+      - gateway
     extends:
       file: common-config.yml
       service: network-deploy-service
@@ -210,7 +262,7 @@ services:
 
 
   configserver:
-    image: "krishanachintha/configserver:s11"
+    image: "krishanachintha/configserver:s12"
     container_name: configserver-ms
     ports:
       - "8071:8071"
@@ -226,7 +278,7 @@ services:
 
 
   eurekaserver:
-    image: "krishanachintha/eurekaserver:s11"
+    image: "krishanachintha/eurekaserver:12"
     container_name: eurekaserver-ms
     ports:
       - "8070:8070"
@@ -245,11 +297,9 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"
 
-  account:
-    image: "krishanachintha/accounts:s11"
+  accounts:
+    image: "krishanachintha/accounts:s12"
     container_name: account-ms
-    ports:
-      - "8080:8080"
     depends_on:
       configserver:
         condition: service_healthy
@@ -271,10 +321,8 @@ services:
       service: microservice-eureka-config
 
   loans:
-    image: "krishanachintha/loans:s11"
+    image: "krishanachintha/loans:s12"
     container_name: loans-ms
-    ports:
-      - "8090:8090"
     depends_on:
       configserver:
         condition: service_healthy
@@ -296,10 +344,8 @@ services:
         service: microservice-eureka-config
 
   cards:
-    image: "krishanachintha/cards:s11"
+    image: "krishanachintha/cards:s12"
     container_name: cards-ms
-    ports:
-      - "9000:9000"
     depends_on:
       configserver:
         condition: service_healthy
@@ -322,7 +368,7 @@ services:
 
 
   gatewayserver:
-    image: "krishanachintha/gatewayserver:s11"
+    image: "krishanachintha/gatewayserver:s12"
     container_name: gatewayserver-ms
     ports:
       - "8072:8072"
@@ -338,6 +384,8 @@ services:
       service: microservice-eureka-config
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
+      OTEL_SERVICE_NAME: "gatewayserver"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
 
 
 networks:
